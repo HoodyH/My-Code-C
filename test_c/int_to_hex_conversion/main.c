@@ -38,20 +38,15 @@ int main(int argc, char **argv)
         }
     }
 
-    for(int8_t i = 0; i<i_format_data; i++){
-        printf("%d", format_data[i]);
-    }
-    printf("\n");
-
     uint8_t * hex_string = convert(10, 16, format_data, i_format_data);
     int8_t hex_string_len = sizeof(hex_string)/sizeof(hex_string[0]);
 
     for(int8_t i_hex = 0; i_hex <= 6; i_hex += 2){
-        //printf("ar %d, br %d\n", hex_string[i_hex], hex_string[i_hex+1]);
+        printf("ar %d, br %d\n", hex_string[i_hex], hex_string[i_hex+1]);
         uint8_t temp = hex_string[i_hex];
         hex_string[i_hex] = reverse(hex_string[i_hex+1]);
         hex_string[i_hex+1] = reverse(temp);
-        //printf("ac %d, bc %d\n", hex_string[i_hex], hex_string[i_hex+1]);
+        printf("ac %d, bc %d\n", hex_string[i_hex], hex_string[i_hex+1]);
     }
 
     for(int8_t i_hex = 0; i_hex < 10; i_hex++){
