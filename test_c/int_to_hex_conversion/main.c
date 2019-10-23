@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 
-void convert(int8_t from, int8_t to, int16_t * data, int8_t len);
+char * convert(int8_t from, int8_t to, int16_t * data, int8_t len);
 int8_t b2_shift(int8_t val);
 
 int main(int argc, char **argv)
@@ -32,12 +32,15 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void convert(int8_t from, int8_t to, int16_t * data, int8_t len)
+/*
+you need to send as input a reversed int array and is len
+*/
+char * convert(int8_t from, int8_t to, int16_t * data, int8_t len)
 {
     
     //only do base 2 to base 36 (digit represented by characters 0-Z)"
     if (from < 2 || from > 36 || to < 2 || to > 36) { 
-        return; 
+        return ""; 
     }
 
     int16_t ol = len * (from / to+1);
@@ -46,9 +49,9 @@ void convert(int8_t from, int8_t to, int16_t * data, int8_t len)
     ts[0] = 1; //initialize array with number 1 
     
     //evaluate the output
-    for (int16_t i = 0; i < len; i++) //for each input digit
+    for (int8_t i = 0; i < len; i++) //for each input digit
     {
-        for (int16_t j = 0; j < ol; j++) //add the input digit 
+        for (int8_t j = 0; j < ol; j++) //add the input digit 
             // times (base:to from^i) to the output cumulator
         {
             cums[j] += ts[j] * data[i];
@@ -66,11 +69,11 @@ void convert(int8_t from, int8_t to, int16_t * data, int8_t len)
         }
         
         //calculate the next power from^i) in base:to format
-        for (int16_t j = 0; j < ol; j++)
+        for (int8_t j = 0; j < ol; j++)
         {
             ts[j] = ts[j] * from;
         } 
-        for(int16_t j=0;j<ol;j++) //check for any remainders
+        for(int8_t j=0;j<ol;j++) //check for any remainders
         {
             int16_t temp = ts[j];
             int16_t rem = 0;
@@ -86,28 +89,27 @@ void convert(int8_t from, int8_t to, int16_t * data, int8_t len)
         }
     }
     
-    for (int16_t i = len - 1; i >= 0; i--)
-    {   
-        printf("cums %d\n", cums[i]);
-    }
-    
     //convert the output to string format (digits 0, to-1 converted to 0-Z characters) 
-    char sout[8] = "/0";
-    int16_t first = 0; //leading zero flag
-    printf("ol = %d\n", ol);
-    for (int i = ol ; i >= 0; i--)
-    {
-        if (cums[i] != 0) { first = 1; }
-        if (!first) { continue; }
-        if (cums[i] < 10) { 
-            sout[i] = (char)(cums[i] + '0'); 
-        }
-        else { 
-            sout[i] = (char)(cums[i] + 'A'-10); 
+    char * out_data = malloc( sizeof(char) * ol);
+    int8_t i_out_data = 0;
+    int8_t jump_zero_at_start = 0;
+
+    for (int8_t i_cums = ol ; i_cums >= 0; i_cums--)
+    {   
+        printf("cums %d\n", cums[i_cums]);
+        if(0 != cums[i_cums] || 1 == jump_zero_at_start){
+            jump_zero_at_start = 1;
+            if (cums[i_cums] < 10) { 
+                out_data[i_out_data++] = (char)(cums[i_cums] + '0'); 
+            }
+            else { 
+                out_data[i_out_data++] = (char)(cums[i_cums] + 'A'-10); 
+            }
         }
     }
-    sout[7] = '/0';
-    printf("hex data = %s\n", sout);
+    out_data[i_out_data] = '\0';
+    printf("hex data = %s\n", out_data);
+    return out_data;
 }
 
 int8_t b2_shift(int8_t val){
