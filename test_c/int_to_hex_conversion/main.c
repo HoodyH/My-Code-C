@@ -3,74 +3,55 @@
 #include <stdint.h>
 
 
-void convert(int8_t from, int8_t to, char * s);
+void convert(int8_t from, int8_t to, int16_t * data, int8_t len);
 int8_t b2_shift(int8_t val);
 
 int main(int argc, char **argv)
 {
     int8_t data[10] = {0,0,0,6,0,8,0,9,1,0};
-    char str_data[12];
+    int16_t format_data[10];
 
     int8_t len = sizeof(data)/sizeof(data[0]);
-    int8_t i_str_data = 0;
+    int8_t i_format_data = 0;
+    int8_t zero_counter = 0;
     int8_t jump_zero_at_start = 0;
-    printf("len = %d\n", len);
 
-    for(int8_t i_data = 0; i_data <= len-1; i_data++){
-        if(0 != data[i_data] || 1 == jump_zero_at_start){
-            jump_zero_at_start = 1;
-            str_data[i_str_data] = (char)(data[i_data] + '0');
-            i_str_data++;
+    for(int8_t i_data = 0; i_data <= len; i_data++){
+        if(0 == data[i_data] && 0 == jump_zero_at_start){
+            zero_counter++;
+        } 
+        else jump_zero_at_start = 1;
+        if(1 == jump_zero_at_start){
+            format_data[len - zero_counter - i_format_data++ - 1] = (int16_t)data[i_data];
         }
     }
-    str_data[i_str_data] = '\0';
-    
-    printf("str data = %s\n", str_data);
-    convert(10, 16, str_data);
+    i_format_data--; //remove the last post increment
+
+    convert(10, 16, format_data, i_format_data);
 
     return 0;
 }
 
-void convert(int8_t from, int8_t to, char * s)
+void convert(int8_t from, int8_t to, int16_t * data, int8_t len)
 {
     
     //only do base 2 to base 36 (digit represented by characters 0-Z)"
     if (from < 2 || from > 36 || to < 2 || to > 36) { 
         return; 
     }
-    
-    //convert string to an array of integer digits representing number in base:from
-    int8_t static il = sizeof(s)/sizeof(s[0]) - 1; // remove the \0 in the counting
 
-    int8_t fs[il];
-    int8_t k = 0;
-    for (int8_t i = il - 1; i >= 0; i--)
-    {   
-        printf("c %c\n", s[i]);
-        if (s[i] >= '0' && s[i] <= '9') {
-            fs[k++] = (int8_t)(s[i] - '0');
-        }
-        else
-        {
-            if (s[i] >= 'A' && s[i] <= 'Z') { 
-                fs[k++] = 10 + (int8_t)(s[i] - 'A'); 
-            }
-            else return; //only allow 0-9 A-Z characters
-        }
-    }
-
-    int16_t ol = il * (from / to+1);
+    int16_t ol = len * (from / to+1);
     int16_t ts[ol+10]; //assign accumulation array
     int16_t cums[ol+10]; //assign the result array
     ts[0] = 1; //initialize array with number 1 
     
     //evaluate the output
-    for (int16_t i = 0; i < il; i++) //for each input digit
+    for (int16_t i = 0; i < len; i++) //for each input digit
     {
         for (int16_t j = 0; j < ol; j++) //add the input digit 
             // times (base:to from^i) to the output cumulator
         {
-            cums[j] += ts[j] * fs[i];
+            cums[j] += ts[j] * data[i];
             int16_t temp = cums[j];
             int16_t rem = 0;
             int16_t ip = j;
@@ -83,11 +64,6 @@ void convert(int8_t from, int8_t to, char * s)
             }
             while (temp >=to);
         }
-        for (int16_t i = il - 1; i >= 0; i--)
-        {   
-            printf("cums %d\n", cums[i]);
-        }
-        printf("cums----------\n");
         
         //calculate the next power from^i) in base:to format
         for (int16_t j = 0; j < ol; j++)
@@ -110,7 +86,7 @@ void convert(int8_t from, int8_t to, char * s)
         }
     }
     
-    for (int8_t i = il - 1; i >= 0; i--)
+    for (int16_t i = len - 1; i >= 0; i--)
     {   
         printf("cums %d\n", cums[i]);
     }
