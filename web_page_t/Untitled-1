@@ -1,0 +1,105 @@
+<center>Relè slot '+idx+' </center>
+	<center><table>
+
+		<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		</tr>
+        
+	 	<tr>
+			<td></td>
+			<td rowspan="2">
+			<table style="text-align: center; vertical-align: middle">
+
+			<tr><td>
+				<label>1</label>
+				</td><td>
+				<label>2</label>
+				</td><td>
+			</td></tr>
+			
+			<tr><td>
+				<input type="checkbox" id="'+idx+'rel_1">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_2">
+				</td><td>
+
+			</td></tr>
+			</table>
+			</td>
+		</tr>
+
+		<tr>
+			<td>Relè socket</td>
+		</tr>
+
+
+		<tr>
+			<td>Relè Pulse Seconds</td>
+			<td><input type="number" id="'+idx+'rel_pulse_seconds"></td>
+		</tr>
+
+		<tr>
+			<td>Relè Time</td>
+			<td><input type="number" min=0 max=23 id="'+idx+'rel_hour"> : <input type="number" min=0 max=59 id="'+idx+'rel_min">
+			</td>
+		</tr>
+    
+		<tr>
+			<td></td>
+			<td rowspan="2">
+			<table style="text-align: center; vertical-align: middle">
+			<tr><td>
+				<label>Sun</label>
+				</td><td>
+				<label>Mon</label>
+				</td><td>
+				<label>Tus</label>
+				</td><td>
+				<label>Wen</label>
+				</td><td>
+				<label>Thu</label>
+				</td><td>
+				<label>Fri</label>
+				</td><td>
+				<label>Sat</label>
+			</td></tr>
+			<tr><td>
+				<input type="checkbox" id="'+idx+'rel_sunday">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_monday">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_tuesday">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_wednesday">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_thursday">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_friday">
+				</td><td>
+				<input type="checkbox" id="'+idx+'rel_saturday">
+			</td></tr>
+			</table>
+			</td>
+		</tr>
+
+		<tr>
+			<td>Weekdays</td>
+		</tr>
+	
+    </table></center>
+    <table><center>
+    <tr><td>
+        <button type="button" onClick="removeField('+idx+')">Remove</button>
+    </td></tr>
+    </table></center>
+
+
+
+
+
+
+
+
+
+<center>Relè slot '+idx+' </center><center><table><tr><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td></td><td rowspan="2"><table style="text-align: center; vertical-align: middle"><tr><td><label>1</label></td><td><label>2</label></td><td></td></tr><tr><td><input type="checkbox" id="'+idx+'rel_1"></td><td><input type="checkbox" id="'+idx+'rel_2"></td><td></td></tr></table></td></tr><tr><td>Relè socket</td></tr><tr><td>Relè Pulse Seconds</td><td><input type="number" id="'+idx+'rel_pulse_seconds"></td></tr><tr><td>Relè Time</td><td><input type="number" min=0 max=23 id="'+idx+'rel_hour"> : <input type="number" min=0 max=59 id="'+idx+'rel_min"></td></tr><tr><td></td><td rowspan="2"><table style="text-align: center; vertical-align: middle"><tr><td><label>Sun</label></td><td><label>Mon</label></td><td><label>Tus</label></td><td><label>Wen</label></td><td><label>Thu</label></td><td><label>Fri</label></td><td><label>Sat</label></td></tr><tr><td><input type="checkbox" id="'+idx+'rel_sunday"></td><td><input type="checkbox" id="'+idx+'rel_monday"></td><td><input type="checkbox" id="'+idx+'rel_tuesday"></td><td><input type="checkbox" id="'+idx+'rel_wednesday"></td><td><input type="checkbox" id="'+idx+'rel_thursday"></td><td><input type="checkbox" id="'+idx+'rel_friday"></td><td><input type="checkbox" id="'+idx+'rel_saturday"></td></tr></table></td></tr><tr><td>Weekdays</td></tr></table></center><table><center><tr><td><button type="button" onClick="removeField('+idx+')">Remove</button></td></tr></table></center>

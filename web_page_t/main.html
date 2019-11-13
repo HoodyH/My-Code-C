@@ -1,0 +1,324 @@
+<html>
+<head>
+<title>TelnetData - TDBASE Setup</title>
+<link rel="stylesheet" href="sty.css" type="text/css"/>
+<!--<script src="scr.js" type="text/javascript"></script>-->
+<script type="text/javascript">
+
+
+const ids = [
+    'reboot+schedule+en',
+    'reboot+schedule+h',
+    'reboot+schedule+m',
+];
+
+setCmd = async (cmd, value) => {
+    let call = `/ecmd?${cmd} ${value}`
+    console.log(call)
+    const res = await fetch(call,{credentials: 'include'});
+    const retVal = await res.text();
+
+    if(retVal.indexOf('OK') < 0)
+        throw new Error(cmd);
+
+    return;
+};
+
+getCmd = async (cmd) => {
+    const res = await fetch(`/ecmd?${cmd}`,{credentials: 'include'});
+    return await res.text();
+};
+
+fillField = async (cmd) => {
+
+    const value = await getCmd(cmd)
+
+    const element = document.getElementById(cmd);
+
+    if(['reboot+schedule+en'].indexOf(cmd) >= 0){
+        element.checked = value.indexOf('1') >= 0;
+        if(cmd === 'reboot+schedule+en'){
+            disableRebootScheduleField(!element.checked);
+        }
+    }
+    else{
+        element.value = value.replace('\r','').replace('\n','');
+    }
+};
+
+fillRelSlots = async () => {
+
+};
+
+fillFields = async () => {
+    await Promise.all(ids.map(id => fillField(id)));
+};
+
+disableRebootScheduleField = checked =>{
+	document.getElementById('reboot+schedule+h').disabled = checked;
+	document.getElementById('reboot+schedule+m').disabled = checked;
+};
+
+//add boxes
+var counter = 0
+var idx = 0
+const max_boxes = 9 //max num of boxes
+
+addField = () => {
+
+	if (counter>max_boxes){
+		alert("only "+max_boxes+" box are allowed");
+		return false;
+	}
+
+    var new_text_box_div = document.createElement('div');
+    new_text_box_div.setAttribute("id", "rel_box_" + idx);
+
+	new_text_box_div.innerHTML = `
+    <center><table>
+
+        <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        </tr>
+
+        <table style="text-align: center; vertical-align: middle">
+            <td></td>
+            <label>Relè slot </label>
+            </td><td>
+
+        <tr>
+            <td></td>
+            <td rowspan="2">
+            <table style="text-align: center; vertical-align: middle">
+
+                <tr><td>
+                    <input type="checkbox" id="`+idx+`rel_1">
+                    </td><td>
+                    <input type="checkbox" id="`+idx+`rel_2">
+
+                </td></tr>
+            </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Relè socket</td>
+        </tr>
+
+
+        <tr>
+            <td>Relè Pulse Seconds</td>
+            <td><input type="number" value=2 id="`+idx+`rel_pulse_seconds"></td>
+        </tr>
+
+        <tr>
+            <td>Relè Time</td>
+            <td><input type="number" min=0 max=23 value=12 id="`+idx+`rel_hour"> : <input type="number" min=0 max=59 value=0 id="`+idx+`rel_min">
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td rowspan="2">
+            <table style="text-align: center; vertical-align: middle">
+            <tr><td>
+                <label>Sun</label>
+                </td><td>
+                <label>Mon</label>
+                </td><td>
+                <label>Tus</label>
+                </td><td>
+                <label>Wen</label>
+                </td><td>
+                <label>Thu</label>
+                </td><td>
+                <label>Fri</label>
+                </td><td>
+                <label>Sat</label>
+            </td></tr>
+            <tr><td>
+                <input type="checkbox" id="`+idx+`rel_sunday">
+                </td><td>
+                <input type="checkbox" id="`+idx+`rel_monday">
+                </td><td>
+                <input type="checkbox" id="`+idx+`rel_tuesday">
+                </td><td>
+                <input type="checkbox" id="`+idx+`rel_wednesday">
+                </td><td>
+                <input type="checkbox" id="`+idx+`rel_thursday">
+                </td><td>
+                <input type="checkbox" id="`+idx+`rel_friday">
+                </td><td>
+                <input type="checkbox" id="`+idx+`rel_saturday">
+            </td></tr>
+        </table>
+        </td></tr>
+
+        <tr>
+            <td>Weekdays</td>
+        </tr>
+
+        <table style="text-align: center; vertical-align: middle">
+            <td></td>
+            <button type="button" onClick="removeField(`+idx+`)">Remove</button>
+            </td><td>
+
+    </table></center>
+
+    `
+
+	document.getElementById("reldiv").appendChild(new_text_box_div);
+
+	counter ++;
+	idx ++;
+};
+
+removeField = (index) =>{
+	var text_box_div = document.getElementById('rel_box_' + index);
+    text_box_div.parentNode.removeChild(text_box_div);
+	counter--;
+};
+
+getRelFields = async () => {
+
+    let index = 0
+    for (let i = 0; i < idx; i++) {
+
+        let rel_1 = document.getElementById(i+'rel_1');
+        if(rel_1 != null){
+
+            rel_1 = rel_1.checked;
+            let rel_2 = document.getElementById(i+'rel_2').checked;
+
+            //calculate rel value
+            var rel = 0;
+            if(rel_1 && rel_2)
+                var rel = 3;
+            else if(rel_2)
+                var rel = 2;
+            else if(rel_1)
+                var rel = 1;
+
+            let rel_pulse_seconds = document.getElementById(i+'rel_pulse_seconds').value;
+            let rel_hour = document.getElementById(i+'rel_hour').value;
+            let rel_min = document.getElementById(i+'rel_min').value;
+
+            const rel_weekdays = [
+                'rel_sunday',
+                'rel_monday',
+                'rel_tuesday',
+                'rel_wednesday',
+                'rel_thursday',
+                'rel_friday',
+                'rel_saturday'
+            ];
+
+            let weekdays = 0;
+            for(var day in rel_weekdays){
+
+                let rel_wkd = document.getElementById(i+rel_weekdays[day]).checked;
+                weekdays = weekdays << 1;
+                weekdays = weekdays | (rel_wkd ? 1 : 0);
+            }
+
+            //build arg
+            let arg = `${index} ${rel} ${rel_pulse_seconds} ${rel_hour} ${rel_min} ${weekdays}`
+
+            await setCmd('relay+schedule', arg);
+            index ++;
+
+        }
+    }
+};
+
+saveAndRestart = async () => {
+
+    try{
+        //get and save fields from relè slots
+        getRelFields()
+
+        for(let id of ids){
+            const element = document.getElementById(id);
+
+            if(id=="reboot+schedule+en"){
+                await setCmd(id, element.checked ? '1' : '0');
+            }else{
+                await setCmd(id, element.value);
+            }
+        }
+
+        console.log("...restart");
+        restart();
+    }
+    catch(e){
+        console.log('save and restart error: '+e);
+        document.getElementById(e.message).style.backgroundColor = "red";
+    }
+};
+
+restart = () => {
+	document.getElementById('valdiv').style.visibility = "hidden";
+    document.getElementById('reldiv').style.visibility = "hidden";
+	document.getElementById('waitdiv').style.visibility = "visible";
+	fetch(`/ecmd?reset`,{credentials: 'include'})
+};
+1
+
+</script>
+</head><body onLoad='fillFields()'>
+<h1>Abbelloooo</h1>
+
+<div id="valdiv">
+	<center><table>
+
+		<tr>
+		<td>Daily Reboot Enabled</td>
+		<td><input type="checkbox" id="reboot+schedule+en" onChange="disableRebootScheduleField(!this.checked);"></td>
+		</tr>
+
+		<tr>
+		<td>Daily Reboot</td>
+		<td><input type="number" min=0 max=23 id="reboot+schedule+h"> : <input type="number" min=0 max=59 id="reboot+schedule+m">
+		</td>
+		</tr>
+
+		<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		</tr>
+
+	</table></center>
+</div>
+
+<div id="reldiv">
+    <center>Relè configuration</center>
+    <center><button type="button" onClick="addField()">Add Field</button></center>
+    <br></br>
+</div>
+
+<div id="buttondiv">
+	<br></br>
+	<center><table>
+		<tr><td><button type="button" onClick="saveAndRestart()">Save and restart</button></td></tr>
+	</table></center>
+
+	<br/><br/>
+
+	<form action="idx.ht">
+		<input type="submit" value="Back" />
+	</form>
+</div>
+
+
+
+<div id="waitdiv" style="visibility:hidden">
+	<center> Please wait while Device restarts</center>
+</div>
+
+<div id="logconsole"></div>
+	<script>
+		document.write('<small> © ' + new Date().getFullYear().toString() + ' Abbelloooo.</small>');
+	</script>
+</body>
+</html>
